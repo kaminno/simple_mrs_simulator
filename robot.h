@@ -1,14 +1,14 @@
-#include "position.h"
-#include "velocity.h"
+#include "vector_t.h"
 
 class Robot{
     private:
         static unsigned int classId;
         unsigned int id;
-        Position* current_position;
-        Velocity* current_linear_velocity;
-        // Acceleration* current_acceleration;
-        // TODO add maximum velocity as constraint to not get infinite velocity
+        Vector* currentPosition;
+        Vector* currentLinearVelocity;
+        Vector* currentAcceleration;
+        double maxVelocity;
+        double maxAcceleration;
         unsigned int heading;
     public:
         Robot();
@@ -17,6 +17,7 @@ class Robot{
         ~Robot();
         unsigned int getId();
         unsigned int getNumberOfRobots();
+        Vector getCurrentPosition();
 
 
         // Position* position = new Position(3, 3, 4);
