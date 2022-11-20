@@ -1,6 +1,7 @@
 #include <iostream>
 #include "robot.h"
 
+#include "robot_simulator.h"
 // #include <stdlib.h>
 #include "boost/numeric/odeint.hpp"
 
@@ -16,7 +17,7 @@ using namespace boost::numeric::odeint;
 void rhs( const double x , double &dxdt , const double t )
 {
     // dxdt = 3.0/(2.0*t*t) + x/(2.0*t);
-    dxdt = x*t;
+    dxdt = 2;
 }
 
 void write_cout( const double &x , const double t )
@@ -29,7 +30,7 @@ typedef runge_kutta_dopri5< double > stepper_type;
 
 int main(){
 
-    Robot* r_1 = new Robot();
+    Robot* r_1 = new Robot(5, 5, 5);
     Robot* r_2 = new Robot(3, 2, 2);
     Robot* r_3 = new Robot();
     // std::cout << robot->state->getX() << std::endl;
@@ -41,14 +42,21 @@ int main(){
 
     // std::cout << vectorNorm(3, 4, 0) << std::endl;
     std::cout << r_1->getCurrentPosition().getX() << std::endl;
+    r_1->getCurrentPosition().setX(-1);
+    std::cout << r_1->getCurrentPosition().getX() << std::endl;
 
     double x = 0.0;
     integrate_adaptive( make_controlled( 1E-12 , 1E-12 , stepper_type() ) ,
                         rhs , x , 1.0 , 10.0 , 0.1 , write_cout );
 
+    cout << "--------------------" << endl;
+    RobotSimulator* rs = new RobotSimulator();
+    rs->simulationTest();
+
     delete r_1;
     delete r_2;
     delete r_3;
+    delete rs;
 
     return 1;
 }
