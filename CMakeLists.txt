@@ -203,3 +203,8 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+add_executable(simulation_test src/test_environment.cpp src/robot.cpp src/robot_simulator.cpp src/equation.h src/vector_t.cpp src/update.h)
+# add_executable(simulation_test src/*.cpp src/*.h)
+target_link_libraries(simulation_test ${catkin_LIBRARIES})
+# add_dependencies(test beginner_tutorials_generate_messages_cpp)

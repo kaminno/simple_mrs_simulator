@@ -3,9 +3,9 @@
 
 #include "robot.h"
 #include "vector_t.h"
-#include "velocityEquation.h"
-#include "position_equation.h"
-#include "updater.h"
+// #include "velocityEquation.h"
+// #include "position_equation.h"
+// #include "updater.h"
 #include "update.h"
 #include "equation.h"
 
