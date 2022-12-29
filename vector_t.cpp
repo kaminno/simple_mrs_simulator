@@ -10,6 +10,12 @@ Vector::Vector(double x, double y, double z){
     this->z = z;
 }
 
+Vector::Vector(Vector* v){
+    this->x = v->getX();
+    this->y = v->getY();
+    this->z = v->getZ();
+}
+
 Vector::~Vector() {}
 
 double Vector::getX(){

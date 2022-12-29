@@ -1,4 +1,10 @@
 #include <iostream>
+
+#include <chrono>
+#include <thread>
+#include <ctime>
+
+#include <vector>
 #include "robot.h"
 
 #include "robot_simulator.h"
@@ -8,24 +14,6 @@
 using namespace std;
 using namespace boost::numeric::odeint;
 
-
-/* we solve the simple ODE x' = 3/(2t^2) + x/(2t)
- * with initial condition x(1) = 0.
- * Analytic solution is x(t) = sqrt(t) - 1/t
- */
-
-void rhs( const double x , double &dxdt , const double t )
-{
-    // dxdt = 3.0/(2.0*t*t) + x/(2.0*t);
-    dxdt = 2;
-}
-
-void write_cout( const double &x , const double t )
-{
-    cout << t << '\t' << x << endl;
-}
-
-// state_type = double
 typedef runge_kutta_dopri5< double > stepper_type;
 
 int main(){
@@ -33,26 +21,62 @@ int main(){
     Robot* r_1 = new Robot(5, 5, 5);
     Robot* r_2 = new Robot(3, 2, 2);
     Robot* r_3 = new Robot();
-    // std::cout << robot->state->getX() << std::endl;
+
     std::cout << r_1->getId() << std::endl;
     std::cout << r_2->getId() << std::endl;
     std::cout << r_3->getId() << std::endl;
     std::cout << "Number of robots: " << r_1->getNumberOfRobots() << std::endl;
     
-
-    // std::cout << vectorNorm(3, 4, 0) << std::endl;
     std::cout << r_1->getCurrentPosition().getX() << std::endl;
     r_1->getCurrentPosition().setX(-1);
     std::cout << r_1->getCurrentPosition().getX() << std::endl;
 
-    double x = 0.0;
-    integrate_adaptive( make_controlled( 1E-12 , 1E-12 , stepper_type() ) ,
-                        rhs , x , 1.0 , 10.0 , 0.1 , write_cout );
-
-    cout << "--------------------" << endl;
     RobotSimulator* rs = new RobotSimulator();
-    rs->simulationTest();
 
+    r_3->setMaxHorizontalLinearVelocity(30);
+    r_3->setMaxVerticalLinearVelocity(10);
+    r_3->setMaxHorizontalLinearAcceleration(30);
+    r_3->setMaxVerticalLinearAcceleration(10);
+    r_3->setLinearVelocity(1, 2, 1);
+    rs->setSimulationFrequency(10);
+
+    r_3->printA();
+    r_3->printV();
+    r_3->printS();
+
+    std::cout << "===== simulation started =====" << std::endl;
+
+    for(int i = 0; i < 10; i++){
+
+        std::cout << "iteration: " << i << std::endl;
+        auto start = std::chrono::high_resolution_clock::now();
+
+        if(i == 3 || i == 7){
+            r_3->setLinearAcceleration(0, 0, 2);
+        }
+        else{
+            r_3->setLinearAcceleration(0, 0, 0);
+        }
+        rs->simulationTest(r_3);
+
+        auto end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double, std::milli> fp_ms = end - start;
+        auto diff = (1000 * rs->getSimulationTime()) - fp_ms.count();
+        unsigned int secs = diff > 0 ? (unsigned int)diff : 0;
+
+        std::cout << "diff: " << diff << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(secs));
+        std::cout << "slept for " << secs << " milliseconds." << std::endl;
+
+    }
+
+    std::cout << "===== simulation ended =====" << std::endl;
+
+    r_3->printA();
+    r_3->printV();
+    r_3->printS();
+    
+    
     delete r_1;
     delete r_2;
     delete r_3;

@@ -9,7 +9,7 @@ CFLAGS  = -g -Wall
 # The build target 
 TARGET = test
 
-FILES := test_environment.cpp robot.cpp vector_t.cpp robot_simulator.cpp
+FILES := test_environment.cpp robot.cpp vector_t.cpp robot_simulator.cpp equation.h update.h
 
 all: $(TARGET)
 

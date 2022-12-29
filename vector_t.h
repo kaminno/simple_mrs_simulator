@@ -9,6 +9,7 @@ class Vector{
     public:
         Vector();
         Vector(double x, double y, double z);
+        Vector(Vector* v);
         ~Vector();
         double getX();
         double getY();
