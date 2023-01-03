@@ -76,6 +76,8 @@ int main(){
     r_3->printV();
     r_3->printS();
     
+    r_3->setLinearVelocity(-20, 40, -30);
+    r_3->printV();
     
     delete r_1;
     delete r_2;

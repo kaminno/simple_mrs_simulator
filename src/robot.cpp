@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 #include "robot.h"
 
 unsigned int Robot::classId = 0;
@@ -122,12 +123,13 @@ void Robot::setLinearVelocity(double v_x, double v_y, double v_z){
         // double newVelocitySize = Vector::vectorNorm(v_x, v_y, v_z);
         double horizontalSize = Vector::vectorNorm(v_x, v_y, 0);
         double verticalSize = Vector::vectorNorm(0, 0, v_z);
+        double c = horizontalSize / this-> maxHorizontalLinearVelocity;
         // if(newVelocitySize <= this->maxVelocity){
         //     this->currentLinearVelocity->setVectorCoordinates(v_x, v_y, v_z);
         // }
-        double vx = horizontalSize <= this->maxHorizontalLinearVelocity ? v_x : this->currentLinearVelocity->getX();
-        double vy = horizontalSize <= this->maxHorizontalLinearVelocity ? v_y : this->currentLinearVelocity->getY();
-        double vz = verticalSize <= this->maxVerticalLinearVelocity ? v_z : this->currentLinearVelocity->getZ();
+        double vx = horizontalSize <= this->maxHorizontalLinearVelocity ? v_x : v_x / c;//this->currentLinearVelocity->getX();
+        double vy = horizontalSize <= this->maxHorizontalLinearVelocity ? v_y : v_y / c;//this->currentLinearVelocity->getY();
+        double vz = verticalSize <= this->maxVerticalLinearVelocity ? v_z : copysign(1.0, v_z)*this->maxVerticalLinearVelocity;
         this->currentLinearVelocity->setVectorCoordinates(vx, vy, vz);
     }
 }
@@ -165,9 +167,10 @@ void Robot::setLinearAcceleration(double a_x, double a_y, double a_z){
     if(this->alive){
         double horizontalSize = Vector::vectorNorm(a_x, a_y, 0);
         double verticalSize = Vector::vectorNorm(0, 0, a_z);
-        double ax = horizontalSize <= this->maxHorizontalLinearAcceleration ? a_x : this->currentLinearAcceleration->getX();
-        double ay = horizontalSize <= this->maxHorizontalLinearAcceleration ? a_y : this->currentLinearAcceleration->getY();
-        double az = verticalSize <= this->maxVerticalLinearAcceleration ? a_z : this->currentLinearAcceleration->getZ();
+        double c = horizontalSize / this-> maxHorizontalLinearAcceleration;
+        double ax = horizontalSize <= this->maxHorizontalLinearAcceleration ? a_x : a_x / c;
+        double ay = horizontalSize <= this->maxHorizontalLinearAcceleration ? a_y : a_y / c;
+        double az = verticalSize <= this->maxVerticalLinearAcceleration ? a_z : copysign(1.0, a_z)*this->maxVerticalLinearAcceleration;
         this->currentLinearAcceleration->setVectorCoordinates(ax, ay, az);
     }
 }
