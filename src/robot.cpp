@@ -5,7 +5,7 @@
 unsigned int Robot::classId = 0;
 
 Robot::Robot()
-: id(classId++), alive(true), currentHeading(0), maxHorizontalLinearVelocity(1),
+: id(classId++), fly(true), currentHeading(0), maxHorizontalLinearVelocity(1),
     maxVerticalLinearVelocity(1), maxHorizontalLinearAcceleration(1), maxVerticalLinearAcceleration(1) {
     this->currentPosition = new Vector();
     // this->currentPosition->setZ(1);
@@ -52,7 +52,7 @@ unsigned int Robot::getNumberOfRobots(){
 }
 
 bool Robot::isAlive(){
-    return this->alive;
+    return this->fly;
 }
 
 Vector Robot::getCurrentPosition(){
@@ -96,14 +96,14 @@ double Robot::getMaxVerticalLinearAcceleration(){
 }
 
 void Robot::setAlive(bool alive){
-    this->alive = alive;
+    this->fly = alive;
 }
 
 void Robot::setPosition(double x, double y, double z){
-    if(this->alive){
+    if(this->fly){
         if(z < 0){
             z = -1;
-            this->alive = false;
+            this->fly = false;
             std::cerr << "Dron " << this->id << " crashed!" << std::endl;
         }
         this->currentPosition->setVectorCoordinates(x, y, z);
@@ -119,7 +119,7 @@ void Robot::setPosition(Vector s){
 }
 
 void Robot::setLinearVelocity(double v_x, double v_y, double v_z){
-    if(this->alive){
+    if(this->fly){
         // double newVelocitySize = Vector::vectorNorm(v_x, v_y, v_z);
         double horizontalSize = Vector::vectorNorm(v_x, v_y, 0);
         double verticalSize = Vector::vectorNorm(0, 0, v_z);
@@ -164,7 +164,7 @@ void Robot::setAngularVelocity(Vector v){
 }
 
 void Robot::setLinearAcceleration(double a_x, double a_y, double a_z){
-    if(this->alive){
+    if(this->fly){
         double horizontalSize = Vector::vectorNorm(a_x, a_y, 0);
         double verticalSize = Vector::vectorNorm(0, 0, a_z);
         double c = horizontalSize / this-> maxHorizontalLinearAcceleration;
@@ -192,7 +192,7 @@ void Robot::setAngularAcceleration(Vector v){
 
 void Robot::setHeading(double heading){
     // make sure that new heading is in correct range <0, 2pi)
-    if(this->alive){
+    if(this->fly){
         this->currentHeading = heading;
     }
 }

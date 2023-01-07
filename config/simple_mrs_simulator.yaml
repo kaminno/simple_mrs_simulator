@@ -1,0 +1,32 @@
+# test_param: "test param"
+# velocity: 13
+# acc: [1, 2, 43]
+
+uav_count: 3
+# random indices are 0, 1, 2 etc.
+use_random_indexing: true
+# if use_random_indexing is set to false, then uav_indices list must be set, list of ints
+uav_indices: []
+start_at_random_positions: true
+minimum_uav_starting_distance: 1
+# if start_at_random_positions is false, then set starting_positions, list of lists [x, y, z]
+starting_positions: []
+# default starting linear velocities and accelerations are 0 vectors, [vx, vy, vz] = [0, 0, 0], angular just v = 0
+use_default_linear_velocities: true
+starting_linear_velocities: []
+use_default_angular_velocities: true
+starting_angular_velocities: []
+use_default_linear_accelerations: true
+starting_linear_accelerations: []
+use_default_angular_accelerations: true
+starting_angular_accelerations: []
+# default heading is 0 for each uav
+use_default_headings: true
+# if use_default_headings is false, then set starting_heading, list of ints
+starting_headings: []
+use_default_maximal_horizontal_linear_velocity: true
+use_default_maximal_vertical_linear_velocity: true
+use_default_maximal_angular_velocity: true
+use_default_maximal_horizontal_linear_acceleration: true
+use_default_maximal_vertical_linear_acceleration: true
+use_default_maximal_angular_acceleration: true

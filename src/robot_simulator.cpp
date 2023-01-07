@@ -131,7 +131,7 @@ void RobotSimulator::computeBoth(){
     this->eq->setV(this->currentRobot->getCurrentLinearVelocity());
     integrate(*this->eq, s, 0.0, this->simulationTime, this->stepSize, *this->up);
                  
-    std::cout << "--------------------" << std::endl;
+    // std::cout << "--------------------" << std::endl;
 }
 
 void RobotSimulator::simulationTest(Robot* robot){
@@ -140,10 +140,10 @@ void RobotSimulator::simulationTest(Robot* robot){
 
     this->up->setRobot(this->currentRobot);
 
-    std::cout << "stats before simulation step: " << std::endl;
-    this->currentRobot->printS();
-    this->currentRobot->printV();
-    this->currentRobot->printA();
+    // std::cout << "stats before simulation step: " << std::endl;
+    // this->currentRobot->printS();
+    // this->currentRobot->printV();
+    // this->currentRobot->printA();
 
     // this->computeLinearVelocity();
     // this->computePosition();

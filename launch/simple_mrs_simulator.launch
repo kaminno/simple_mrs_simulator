@@ -1,0 +1,7 @@
+<launch>
+  <node name="simulation_node" pkg="simple_mrs_simulator" type="simulation_test" output="screen">
+    <rosparam file="$(find simple_mrs_simulator)/config/simple_mrs_simulator.yaml"/>
+  </node>
+  <node name="pid_controller_node" pkg="simple_mrs_simulator" type="pid_controller" output="screen"/>
+  <!-- <node name="test_alg_node" pkg="simple_mrs_simulator" type="test_alg" output="screen"/> -->
+</launch>

@@ -7,7 +7,7 @@ class Robot{
     private:
         static unsigned int classId;
         unsigned int id;
-        bool alive;
+        bool fly;
         Vector* currentPosition;
         Vector* currentLinearVelocity;
         Vector* currentAngularVelocity;
@@ -18,6 +18,8 @@ class Robot{
         double maxVerticalLinearVelocity;
         double maxHorizontalLinearAcceleration;
         double maxVerticalLinearAcceleration;
+        double maxAngularVelocity;
+        double maxAngularAcceleration;
     public:
         Robot();
         Robot(double x, double y, double z);
