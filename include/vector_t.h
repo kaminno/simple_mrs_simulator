@@ -23,6 +23,9 @@ class Vector{
         void setVectorCoordinates(Vector v);
         static double vectorNorm(double x, double y, double z);
         static double vectorNorm(Vector v);
+        // Vector operator*(double c){
+        //     return Vector(this->x * c, this->y * c, this->z * c);
+        // }
 };
 
 #endif

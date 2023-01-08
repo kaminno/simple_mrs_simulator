@@ -9,14 +9,16 @@
 #include <map>
 #include <random>
 #include <list>
-#include "robot.h"
+#include "../include/robot.h"
+#include <cmath>
 
-#include "robot_simulator.h"
+#include "../include/robot_simulator.h"
 // #include <stdlib.h>
 #include "boost/numeric/odeint.hpp"
 
 #include <ros/ros.h>
 #include <visualization_msgs/Marker.h>
+#include <visualization_msgs/MarkerArray.h>
 #include <ros/node_handle.h>
 #include "std_msgs/String.h"
 #include "mrs_msgs/Reference.h"
@@ -27,11 +29,19 @@ using namespace boost::numeric::odeint;
 
 typedef runge_kutta_dopri5< double > stepper_type;
 
+void callback(const mrs_msgs::Reference::ConstPtr& msg, Robot* uav){
+    ROS_INFO("I heard on /uav%d/acceleration", uav->getId());
+    uav->setLinearAcceleration(msg->position.x, msg->position.y, msg->position.z);
+    uav->setAngularAcceleration(msg->heading);
+    ROS_INFO("\tx: %f, y: %f, z: %f, heading: %f", msg->position.x, msg->position.y, msg->position.z, msg->heading);
+}
+
 int main( int argc, char** argv ){
 
     ros::init(argc, argv, "simulation_test");
     ros::NodeHandle nh;
-    ros::Publisher marker_pub = nh.advertise<visualization_msgs::Marker>("visualization_marker", 10);
+    // ros::Publisher marker_pub = nh.advertise<visualization_msgs::Marker>("visualization_marker", 10);
+    ros::Publisher marker_pub = nh.advertise<visualization_msgs::MarkerArray>("visualization_marker_array", 100);
     // ros::Rate r(30);
     
     std::vector<string> compulsory_default_parameters_keys{"use_random_indexing", "start_at_random_positions",
@@ -78,9 +88,12 @@ int main( int argc, char** argv ){
     std::cout << "===== simulation started =====" << std::endl;
     
     RobotSimulator*rs = new RobotSimulator();
+    // rs->setNumberOfSteps(10);
+    rs->setSimulationFrequency(10);
     // Robot* uavs[uav_count];
     std::vector<Robot*> uavs;
     std::map<Robot*, ros::Publisher> publishers;
+    std::vector<ros::Subscriber> subscribers;
     double lower_bound = 0;
     double upper_bound = 15;
     std::uniform_real_distribution<double> unif(lower_bound,upper_bound);
@@ -94,13 +107,20 @@ int main( int argc, char** argv ){
         uavs.push_back(new Robot(x, y, z));
         uavs.back()->printS();
         publishers[uavs.back()] = nh.advertise<mrs_msgs::Reference>("/uav" + std::to_string(uavs.back()->getId()) + "/pose", 10);
+        subscribers.push_back(nh.subscribe<mrs_msgs::Reference>("/uav" + std::to_string(uavs.back()->getId()) + "/acceleration", 1000, boost::bind(callback, _1, uavs.back())));
     }
 
     // ros::Publisher mrs_pub = nh.advertise<mrs_msgs::Reference>("mrs_ref", 10);
     int i = 0;
+    
+    // ros::Subscriber sub0 = nh.subscribe<mrs_msgs::Reference>("/uav0/acceleration", 1000, boost::bind(callback, _1, uavs[0]));
+    // ros::Subscriber sub1 = nh.subscribe<mrs_msgs::Reference>("/uav1/acceleration", 1000, boost::bind(callback, _1, uavs[1]));
     while(ros::ok()){
         i++;
+        visualization_msgs::MarkerArray markerArray;
+        auto start = std::chrono::high_resolution_clock::now();
         for(Robot* drone : uavs){
+            ros::spinOnce();
             // position publisher
             // ros::Publisher uav_pub = nh.advertise<std_msgs::String>("/uav" + std::to_string(drone->getId()) + "/pose", 10);
             // uav_pub = nh.advertise<std_msgs::String>("/uav" + std::to_string(drone->getId()) + "/pose", 10);
@@ -122,7 +142,7 @@ int main( int argc, char** argv ){
             ref.position.y = drone->getCurrentPosition().getY();
             ref.position.z = drone->getCurrentPosition().getZ();
             // ROS_INFO("heading: %f", ref.heading);
-            ROS_INFO("uav %d x: %f", drone->getId(), ref.position.x);
+            // ROS_INFO("uav %d x: %f", drone->getId(), ref.position.x);
             uav_pub.publish(ref);
             //
             visualization_msgs::Marker points;
@@ -143,7 +163,7 @@ int main( int argc, char** argv ){
             points.color.a = 1.0;
 
             // std::cout <<  "iteration: " << i << ", drone " << drone->getId() << std::endl;
-            auto start = std::chrono::high_resolution_clock::now();
+            // auto start = std::chrono::high_resolution_clock::now();
 
             // if(i == 3 || i == 7){
             //     r_3->setLinearAcceleration(0, 0, 2);
@@ -152,25 +172,33 @@ int main( int argc, char** argv ){
             //     r_3->setLinearAcceleration(0, 0, 0);
             // }
             // if(i == 40){
-            if(i == 2){
-                drone->setLinearAcceleration(0, 0, 0.2);
-            }
-            if(i == 80){
-                drone->setLinearAcceleration(0, 0, -1);
-            }
-            if(i == 130){
-                drone->setLinearAcceleration(0, 0, 0);
-            }
-            if(i >= 100){
-                points.pose.orientation.x = 0.5;
-                points.pose.orientation.y = 0.5;
-                points.pose.orientation.z = 0.5;
-            }
+
+            // if(i == 2){
+            //     drone->setLinearAcceleration(0, 0, 0.2);
+            //     drone->setAngularAcceleration(0.5);
+            // }
+            // if(i==10){
+            //     drone->setAngularAcceleration(-0.5);
+            // }
+            // if(i == 80){
+            //     drone->setLinearAcceleration(0, 0, -1);
+            // }
+            // if(i == 130){
+            //     drone->setLinearAcceleration(0, 0, 0);
+            // }
+
+            // if(i >= 100){
+            //     points.pose.orientation.x = 0.5;
+            //     points.pose.orientation.y = 0.5;
+            //     points.pose.orientation.z = 0.5;
+            // }
 
             // pro paralelizaci vyrobit v každé iteraci samostatný simulátor?
             rs->simulationTest(drone);
-
-            geometry_msgs::Point p;
+            // std::cout << "angular acc: " <<drone->getCurrentAngularAcceleration() << std::endl;
+            // std::cout << "angular vel: " <<drone->getCurrentAngularVelocity() << std::endl;
+            // std::cout << "heading: " <<drone->getCurrentHeading() << std::endl;
+            // geometry_msgs::Point p;
             // p.x = drone->getCurrentPosition().getX();
             // p.y = drone->getCurrentPosition().getY();
             // p.z = drone->getCurrentPosition().getZ();
@@ -178,20 +206,40 @@ int main( int argc, char** argv ){
             points.pose.position.x = drone->getCurrentPosition().getX();
             points.pose.position.y = drone->getCurrentPosition().getY();
             points.pose.position.z = drone->getCurrentPosition().getZ();
+            points.pose.orientation.x = 0;
+            points.pose.orientation.y = 0;
+            double qz = sin(drone->getCurrentHeading() * M_PI /2);
+            double qw = cos(drone->getCurrentHeading() * M_PI /2);
+            double mag = sqrt(qz * qz + qw * qw);
+            // points.pose.orientation.z = sin(drone->getCurrentHeading() /2);
+            // points.pose.orientation.w = cos(drone->getCurrentHeading() /2);
+            points.pose.orientation.z = qz / mag;
+            points.pose.orientation.w = qw / mag;
             // points.pose.orientation.x = 0.0;
 
-            marker_pub.publish(points);
+            // marker_pub.publish(points);
+            markerArray.markers.push_back(points);
 
-            auto end = std::chrono::high_resolution_clock::now();
-            std::chrono::duration<double, std::milli> fp_ms = end - start;
-            auto diff = (1000 * rs->getSimulationTime()) - fp_ms.count();
-            unsigned int secs = diff > 0 ? (unsigned int)diff : 0;
+            // auto end = std::chrono::high_resolution_clock::now();
+            // std::chrono::duration<double, std::milli> fp_ms = end - start;
+            // auto diff = (1000 * rs->getSimulationTime()) - fp_ms.count();
+            // unsigned int secs = diff > 0 ? (unsigned int)diff : 0;
 
-            // std::cout << "diff: " << diff << std::endl;
-            std::this_thread::sleep_for(std::chrono::milliseconds(secs));
+            // // std::cout << "diff: " << diff << std::endl;
+            // std::this_thread::sleep_for(std::chrono::milliseconds(secs));
             // std::cout << "slept for " << secs << " milliseconds." << std::endl;
         
         }
+        
+        marker_pub.publish(markerArray);
+        // ros::spin();
+        auto end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double, std::milli> fp_ms = end - start;
+        auto diff = (1000 * rs->getSimulationTime()) - fp_ms.count();
+        unsigned int secs = diff > 0 ? (unsigned int)diff : 0;
+        std::this_thread::sleep_for(std::chrono::milliseconds(secs));
+        std::cout << "slept for " << secs << " milliseconds." << std::endl;
+        std::cout << "--------------------------------" << std::endl;
 
     }
 

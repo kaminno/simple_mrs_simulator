@@ -6,10 +6,10 @@
 // #include "velocityEquation.h"
 // #include "position_equation.h"
 // #include "updater.h"
-#include "update.h"
-#include "equation.h"
+#include "updater.h"
+#include "equation_of_motion.h"
 
-const double ZERO = 1e-3;
+// const double ZERO = 1e-3;
 
 class RobotSimulator{
     private:
@@ -21,12 +21,12 @@ class RobotSimulator{
         Robot* currentRobot;
         // VelocityEquation* ve;
         // PositionEquation* pe;
-        Equation* eq;
+        EquationOfMotion* equationOfMotion;
         // Updater* upd;
-        Upd* up;
+        Updater* up;
         // void computeLinearVelocity();
         // void computePosition();
-        void computeBoth();
+        void computeNewState();
     public:
         RobotSimulator();
         // RobotSimulator(float g);//, unsigned int frequency);
@@ -42,7 +42,7 @@ class RobotSimulator{
         double getSimulationTime();
         double getStepSize();
         double getNumberOfSteps();
-        Equation* getEquation() {return this->eq;}
+        EquationOfMotion* getEquation() {return this->equationOfMotion;}
 };
 
 #endif

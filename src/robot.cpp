@@ -1,18 +1,19 @@
 #include <iostream>
 #include <cmath>
-#include "robot.h"
+#include "../include/robot.h"
 
 unsigned int Robot::classId = 0;
 
 Robot::Robot()
-: id(classId++), fly(true), currentHeading(0), maxHorizontalLinearVelocity(1),
-    maxVerticalLinearVelocity(1), maxHorizontalLinearAcceleration(1), maxVerticalLinearAcceleration(1) {
+: id(classId++), alive(true), currentHeading(0), currentAngularAcceleration(0), maxHorizontalLinearVelocity(1),
+    currentAngularVelocity(0), maxVerticalLinearVelocity(1), maxHorizontalLinearAcceleration(1), maxVerticalLinearAcceleration(1),
+    maxAngularAcceleration(1), maxAngularVelocity(1) {
     this->currentPosition = new Vector();
     // this->currentPosition->setZ(1);
     this->currentLinearVelocity = new Vector();
-    this->currentAngularVelocity = new Vector();
+    // this->currentAngularVelocity = new Vector();
     this->currentLinearAcceleration = new Vector();
-    this->currentAngularAcceleration = new Vector();
+    // this->currentAngularAcceleration = new Vector();
 }
 
 Robot::Robot(double x, double y, double z)
@@ -38,9 +39,9 @@ Robot::Robot(Vector s, Vector v)
 Robot::~Robot(){
     delete this->currentPosition;
     delete this->currentLinearVelocity;
-    delete this->currentAngularVelocity;
+    // delete this->currentAngularVelocity;
     delete this->currentLinearAcceleration;
-    delete this->currentAngularAcceleration;
+    // delete this->currentAngularAcceleration;
 }
 
 unsigned int Robot::getId(){
@@ -52,7 +53,7 @@ unsigned int Robot::getNumberOfRobots(){
 }
 
 bool Robot::isAlive(){
-    return this->fly;
+    return this->alive;
 }
 
 Vector Robot::getCurrentPosition(){
@@ -63,16 +64,24 @@ Vector Robot::getCurrentLinearVelocity(){
     return this->currentLinearVelocity->getVectorCoordinates();
 }
 
-Vector Robot::getCurrentAngularVelocity(){
-    return this->currentAngularVelocity->getVectorCoordinates();
+double Robot::getCurrentAngularVelocity(){
+    return this->currentAngularVelocity;
 }
+
+// Vector Robot::getCurrentAngularVelocity(){
+//     return this->currentAngularVelocity->getVectorCoordinates();
+// }
 
 Vector Robot::getCurrentLinearAcceleration(){
     return this->currentLinearAcceleration->getVectorCoordinates();
 }
 
-Vector Robot::getCurrentAngularAcceleration(){
-    return this->currentAngularAcceleration->getVectorCoordinates();
+// Vector Robot::getCurrentAngularAcceleration(){
+//     return this->currentAngularAcceleration->getVectorCoordinates();
+// }
+
+double Robot::getCurrentAngularAcceleration(){
+    return this->currentAngularAcceleration;
 }
 
 double Robot::getCurrentHeading(){
@@ -96,14 +105,14 @@ double Robot::getMaxVerticalLinearAcceleration(){
 }
 
 void Robot::setAlive(bool alive){
-    this->fly = alive;
+    this->alive = alive;
 }
 
 void Robot::setPosition(double x, double y, double z){
-    if(this->fly){
+    if(this->alive){
         if(z < 0){
             z = -1;
-            this->fly = false;
+            this->alive = false;
             std::cerr << "Dron " << this->id << " crashed!" << std::endl;
         }
         this->currentPosition->setVectorCoordinates(x, y, z);
@@ -119,7 +128,7 @@ void Robot::setPosition(Vector s){
 }
 
 void Robot::setLinearVelocity(double v_x, double v_y, double v_z){
-    if(this->fly){
+    if(this->alive){
         // double newVelocitySize = Vector::vectorNorm(v_x, v_y, v_z);
         double horizontalSize = Vector::vectorNorm(v_x, v_y, 0);
         double verticalSize = Vector::vectorNorm(0, 0, v_z);
@@ -145,9 +154,10 @@ void Robot::setLinearVelocity(Vector v){
     this->setLinearVelocity(v_x, v_y, v_z);
 }
 
-void Robot::setAngularVelocity(double v_x, double v_y, double v_z){
-    // also recompute the heading
-
+void Robot::setAngularVelocity(double v){
+    if(abs(v) <= this->maxAngularVelocity){
+        this->currentAngularVelocity = v;
+    }
     // TODO - check it
     // double horizontalSize = Vector::vectorNorm(v_x, v_y, 0);
     // double verticalSize = Vector::vectorNorm(0, 0, v_z);
@@ -155,16 +165,11 @@ void Robot::setAngularVelocity(double v_x, double v_y, double v_z){
     // double vy = horizontalSize <= this->maxHorizontalLinearVelocity ? v_y : this->currentLinearVelocity->getY();
     // double vz = verticalSize <= this->maxVerticalLinearVelocity ? v_z : this->currentLinearVelocity->getZ();
     // this->currentLinearVelocity->setVectorCoordinates(vx, vy, vz);
-    std::cerr << "Robot::setAngularVelocity() has to be implemented!" << std::endl;
-}
-
-void Robot::setAngularVelocity(Vector v){
-    // also recompute the heading
-    std::cerr << "Robot::setAngularVelocity() has to be implemented!" << std::endl;
+    // std::cerr << "Robot::setAngularVelocity() has to be implemented!" << std::endl;
 }
 
 void Robot::setLinearAcceleration(double a_x, double a_y, double a_z){
-    if(this->fly){
+    if(this->alive){
         double horizontalSize = Vector::vectorNorm(a_x, a_y, 0);
         double verticalSize = Vector::vectorNorm(0, 0, a_z);
         double c = horizontalSize / this-> maxHorizontalLinearAcceleration;
@@ -182,18 +187,24 @@ void Robot::setLinearAcceleration(Vector a){
     this->setLinearAcceleration(a_x, a_y, a_z);
 }
 
-void Robot::setAngularAcceleration(double v_x, double v_y, double v_z){
-    std::cerr << "Robot::setAngularAcceleration() has to be implemented!" << std::endl;
-}
+// void Robot::setAngularAcceleration(double v_x, double v_y, double v_z){
+//     std::cerr << "Robot::setAngularAcceleration() has to be implemented!" << std::endl;
+// }
 
-void Robot::setAngularAcceleration(Vector v){
-    std::cerr << "Robot::setAngularAcceleration() has to be implemented!" << std::endl;
+// void Robot::setAngularAcceleration(Vector v){
+//     std::cerr << "Robot::setAngularAcceleration() has to be implemented!" << std::endl;
+// }
+
+void Robot::setAngularAcceleration(double a){
+    if(abs(a) <= this->maxAngularAcceleration){
+        this->currentAngularAcceleration = a;
+    }
 }
 
 void Robot::setHeading(double heading){
     // make sure that new heading is in correct range <0, 2pi)
-    if(this->fly){
-        this->currentHeading = heading;
+    if(this->alive){
+        this->currentHeading = std::fmod(heading, 2);
     }
 }
 

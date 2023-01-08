@@ -1,7 +1,8 @@
-# test_param: "test param"
-# velocity: 13
-# acc: [1, 2, 43]
+# ----- SIMULATION -----
 
+
+
+# ----- DRONES -----
 uav_count: 3
 # random indices are 0, 1, 2 etc.
 use_random_indexing: true

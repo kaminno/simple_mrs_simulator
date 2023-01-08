@@ -38,7 +38,7 @@ int main( int argc, char** argv ){
     std::cout << "NodeHandle ok" << std::endl;
     ros::Rate rate(100);
     ros::Subscriber sub0 = nh.subscribe("/uav0/pose", 1000, chatterCallback0);
-    ros::Subscriber sub1 = nh.subscribe("/uav1/pose", 1000, chatterCallback1);
+    ros::Subscriber sub1 = nh.subscribe("/uav", 1000, chatterCallback1);
     ros::Subscriber sub2 = nh.subscribe("/uav2/pose", 1000, chatterCallback2);
     std::cout << "subscribe ok" << std::endl;
     while(ros::ok()){

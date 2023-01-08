@@ -1,9 +1,9 @@
-#include "robot_simulator.h"
-#include "vector_t.h"
+#include "../include/robot_simulator.h"
+#include "../include/vector_t.h"
 // #include "velocityEquation.h"
 // #include "updater.h"
-#include "update.h"
-#include "equation.h"
+#include "../include/updater.h"
+#include "../include/equation_of_motion.h"
 
 #include "boost/numeric/odeint.hpp"
 using namespace boost::numeric::odeint;
@@ -13,123 +13,38 @@ RobotSimulator::RobotSimulator()
     // this->ve = new VelocityEquation();
     // this->pe = new PositionEquation();
     // this->upd = new Updater();
-    this->eq = new Equation();
-    this->up = new Upd();
+    this->equationOfMotion = new EquationOfMotion();
+    this->up = new Updater();
     this->setSimulationFrequency(1);
     this->setNumberOfSteps(10);
 };
 
 // RobotSimulator::RobotSimulator(float g){};
 RobotSimulator::~RobotSimulator(){
-    delete this->eq->getV();
-    delete this->eq->getA();
-    delete this->eq;
+    delete this->equationOfMotion->getV();
+    delete this->equationOfMotion->getA();
+    delete this->equationOfMotion;
     delete this->up;
 };
 
-// void RobotSimulator::computeLinearVelocity(){
-//     this->upd->setType(SimulationType::accToVel);
-//     typedef runge_kutta_dopri5< double > stepper_type;
-
-//     double x = this->currentRobot->getCurrentLinearVelocity().getX();
-//     this->ve->setA(this->currentRobot->getCurrentLinearAcceleration().getX());
-//     this->upd->setCoordinate(Coordinate::x);
-//     integrate_adaptive(make_controlled( 1E-12 , 1E-12 , stepper_type() ),
-//                  *this->ve, x, 0.0, this->simulationFrequency, this->stepSize, *this->upd);
+void RobotSimulator::computeNewState(){
     
-//     double y = this->currentRobot->getCurrentLinearVelocity().getY();
-//     this->ve->setA(this->currentRobot->getCurrentLinearAcceleration().getY());
-//     this->upd->setCoordinate(Coordinate::y);
-//     integrate_adaptive(make_controlled( 1E-12 , 1E-12 , stepper_type() ),
-//                  *this->ve, y, 0.0, this->simulationFrequency, this->stepSize, *this->upd);
-
-//     double z = this->currentRobot->getCurrentLinearVelocity().getZ();
-//     this->ve->setA(this->currentRobot->getCurrentLinearAcceleration().getZ());
-//     this->ve->setG(this->g);
-//     this->upd->setCoordinate(Coordinate::z);
-//     integrate_adaptive(make_controlled( 1E-12 , 1E-12 , stepper_type() ),
-//                  *this->ve, z, 0.0, this->simulationFrequency, this->stepSize, *this->upd);
-//     this->ve->setG(0);
-
-//     std::cout << "--------------------" << std::endl;
-// }
-
-// void RobotSimulator::computePosition(){
-//     this->computeLinearVelocity();
-
-//     this->upd->setType(SimulationType::velToPos);
-//     typedef runge_kutta_dopri5< double > stepper_type;
-
-//     // std::cout << "1" << std::endl;
-//     double x = this->currentRobot->getCurrentPosition().getX();
-//     // std::cout << "1.1" << std::endl;
-//     this->pe->setV(this->currentRobot->getCurrentLinearVelocity().getX());
-//     // std::cout << "1.2" << std::endl;
-//     this->upd->setCoordinate(Coordinate::x);
-//     // std::cout << "1.3" << std::endl;
-//     integrate_adaptive(make_controlled( 1E-12 , 1E-12 , stepper_type() ),
-//                  *this->pe, x, 0.0, this->simulationFrequency, this->stepSize, *this->upd);
-    
-//     // std::cout << "2" << std::endl;
-//     double y = this->currentRobot->getCurrentPosition().getY();
-//     this->pe->setV(this->currentRobot->getCurrentLinearVelocity().getY());
-//     this->upd->setCoordinate(Coordinate::y);
-//     integrate_adaptive(make_controlled( 1E-12 , 1E-12 , stepper_type() ),
-//                  *this->pe, y, 0.0, this->simulationFrequency, this->stepSize, *this->upd);
-
-//     double z = this->currentRobot->getCurrentPosition().getZ();
-//     this->pe->setV(this->currentRobot->getCurrentLinearVelocity().getZ());
-//     this->upd->setCoordinate(Coordinate::z);
-//     integrate_adaptive(make_controlled( 1E-12 , 1E-12 , stepper_type() ),
-//                  *this->pe, z, 0.0, this->simulationFrequency, this->stepSize, *this->upd);
-                 
-//     std::cout << "--------------------" << std::endl;
-// }
-
-void RobotSimulator::computeBoth(){
-    // this->computeLinearVelocity();
-
-    // this->upd->setType(SimulationType::velToPos);
-    // typedef runge_kutta_dopri5< double > stepper_type;
-
-    // // std::cout << "1" << std::endl;
-    // double x = this->currentRobot->getCurrentPosition().getX();
-    // // std::cout << "1.1" << std::endl;
-    // this->pe->setV(this->currentRobot->getCurrentLinearVelocity().getX());
-    // // std::cout << "1.2" << std::endl;
-    // this->upd->setCoordinate(Coordinate::x);
-    // // std::cout << "1.3" << std::endl;
-    // integrate_adaptive(make_controlled( 1E-12 , 1E-12 , stepper_type() ),
-    //              *this->pe, x, 0.0, this->simulationFrequency, this->stepSize, *this->upd);
-    
-    // // std::cout << "2" << std::endl;
-    // double y = this->currentRobot->getCurrentPosition().getY();
-    // this->pe->setV(this->currentRobot->getCurrentLinearVelocity().getY());
-    // this->upd->setCoordinate(Coordinate::y);
-    // integrate_adaptive(make_controlled( 1E-12 , 1E-12 , stepper_type() ),
-    //              *this->pe, y, 0.0, this->simulationFrequency, this->stepSize, *this->upd);
-
-    // double z = this->currentRobot->getCurrentPosition().getZ();
-    // this->pe->setV(this->currentRobot->getCurrentLinearVelocity().getZ());
-    // this->upd->setCoordinate(Coordinate::z);
-    // integrate_adaptive(make_controlled( 1E-12 , 1E-12 , stepper_type() ),
-    //              *this->pe, z, 0.0, this->simulationFrequency, this->stepSize, *this->upd);
-
-    // double z = this->currentRobot->getCurrentPosition().getZ();
-    // this->pe->setV(this->currentRobot->getCurrentLinearVelocity().getZ());
-    // this->upd->setCoordinate(Coordinate::z);
-    std::vector<double> s(6);
+    std::vector<double> s(8);
     s[0] = this->currentRobot->getCurrentPosition().getX();
     s[1] = this->currentRobot->getCurrentPosition().getY();
     s[2] = this->currentRobot->getCurrentPosition().getZ();
-    s[3] = this->currentRobot->getCurrentLinearVelocity().getX();
-    s[4] = this->currentRobot->getCurrentLinearVelocity().getY();
-    s[5] = this->currentRobot->getCurrentLinearVelocity().getZ();
+    s[3] = this->currentRobot->getCurrentHeading();
+    s[4] = this->currentRobot->getCurrentLinearVelocity().getX();
+    s[5] = this->currentRobot->getCurrentLinearVelocity().getY();
+    s[6] = this->currentRobot->getCurrentLinearVelocity().getZ();
+    s[7] = this->currentRobot->getCurrentAngularVelocity();
     // integrate_adaptive(make_controlled( 1E-12 , 1E-12 , stepper_type() ),
-    //              *this->eq, s, 0.0, this->simulationFrequency, this->stepSize, *this->up);
-    this->eq->setA(this->currentRobot->getCurrentLinearAcceleration());
-    this->eq->setV(this->currentRobot->getCurrentLinearVelocity());
-    integrate(*this->eq, s, 0.0, this->simulationTime, this->stepSize, *this->up);
+    //              *this->equationOfMotion, s, 0.0, this->simulationFrequency, this->stepSize, *this->up);
+    this->equationOfMotion->setA(this->currentRobot->getCurrentLinearAcceleration());
+    this->equationOfMotion->setV(this->currentRobot->getCurrentLinearVelocity());
+    this->equationOfMotion->setAlpha(this->currentRobot->getCurrentAngularAcceleration());
+    this->equationOfMotion->setOmega(this->currentRobot->getCurrentAngularVelocity());
+    integrate(*this->equationOfMotion, s, 0.0, this->simulationTime, this->stepSize, *this->up);
                  
     // std::cout << "--------------------" << std::endl;
 }
@@ -147,7 +62,7 @@ void RobotSimulator::simulationTest(Robot* robot){
 
     // this->computeLinearVelocity();
     // this->computePosition();
-    this->computeBoth();
+    this->computeNewState();
 }
 
 void RobotSimulator::setSimulationFrequency(double freq){

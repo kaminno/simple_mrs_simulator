@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   mrs_msgs
+  visualization_msgs
   genmsg
 )
 
@@ -73,6 +74,7 @@ generate_messages(
   DEPENDENCIES
   std_msgs
   mrs_msgs
+  visualization_msgs
 )
 
 ################################################
@@ -212,6 +214,7 @@ add_executable(pid_controller src/pid_controller.cpp)
 add_executable(test_alg src/test_alg.cpp)
 # add_executable(simulation_test src/*.cpp src/*.h)
 target_link_libraries(simulation_test ${catkin_LIBRARIES})
+target_link_libraries(pid_controller ${catkin_LIBRARIES})
 target_link_libraries(test_alg ${catkin_LIBRARIES})
 add_dependencies(simulation_test ${catkin_EXPORTED_TARGETS})
 # add_dependencies(test beginner_tutorials_generate_messages_cpp)

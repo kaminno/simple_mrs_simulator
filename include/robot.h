@@ -7,12 +7,14 @@ class Robot{
     private:
         static unsigned int classId;
         unsigned int id;
-        bool fly;
+        bool alive;
         Vector* currentPosition;
         Vector* currentLinearVelocity;
-        Vector* currentAngularVelocity;
+        // Vector* currentAngularVelocity;
+        double currentAngularVelocity;
         Vector* currentLinearAcceleration;
-        Vector* currentAngularAcceleration;
+        // Vector* currentAngularAcceleration;
+        double currentAngularAcceleration;
         double currentHeading;
         double maxHorizontalLinearVelocity;
         double maxVerticalLinearVelocity;
@@ -32,32 +34,40 @@ class Robot{
         bool isAlive();
         Vector getCurrentPosition();
         Vector getCurrentLinearVelocity();
-        Vector getCurrentAngularVelocity();
+        // Vector getCurrentAngularVelocity();
+        double getCurrentAngularVelocity();
         Vector getCurrentLinearAcceleration();
-        Vector getCurrentAngularAcceleration();
+        // Vector getCurrentAngularAcceleration();
+        double getCurrentAngularAcceleration();
         double getCurrentHeading();
         double getMaxHorizontalLinearVelocity();
         double getMaxVerticalLinearVelocity();
         double getMaxHorizontalLinearAcceleration();
         double getMaxVerticalLinearAcceleration();
+        double getMaxAngularVelocity();
+        double getMaxAngularAcceleration();
         // maybe let the set methods return vector size to easy check if we achieve its maximum or not
         void setAlive(bool alive);
         void setPosition(double x, double y, double z);
         void setPosition(Vector s);
         void setLinearVelocity(double v_x, double v_y, double v_z);
         void setLinearVelocity(Vector v);
-        void setAngularVelocity(double v_x, double v_y, double v_z);
-        void setAngularVelocity(Vector v);
+        // void setAngularVelocity(double v_x, double v_y, double v_z);
+        // void setAngularVelocity(Vector v);
+        void setAngularVelocity(double v);
         void setLinearAcceleration(double a_x, double a_y, double a_z);
         void setLinearAcceleration(Vector a);
-        void setAngularAcceleration(double a_x, double a_y, double a_z);
-        void setAngularAcceleration(Vector a);
+        // void setAngularAcceleration(double a_x, double a_y, double a_z);
+        // void setAngularAcceleration(Vector a);
+        void setAngularAcceleration(double a);
         // where the angle 0 rad is pointing and if we counted right handed system or not
         void setHeading(double heading);
         void setMaxHorizontalLinearVelocity(double maxVelocity);
         void setMaxVerticalLinearVelocity(double maxVelocity);
         void setMaxHorizontalLinearAcceleration(double maxAcceleration);
         void setMaxVerticalLinearAcceleration(double maxAcceleration);
+        void setMaxAngularVelocity(double maxVelocity);
+        void setMaxAngularAcceleration(double maxAcceleration);
 
         void printS();
         void printV();
